@@ -1,0 +1,42 @@
+.basic-pagination ul li:not(:last-child) {
+    margin-right: 5px;
+}
+
+.basic-pagination ul li {
+    display: inline-block;
+    list-style: none;
+}
+.basic-pagination ul li a:hover, .basic-pagination ul li a.current, .basic-pagination ul li span:hover, .basic-pagination ul li span.current {
+    background: var(--tp-heading-secondary);
+    border-color: var(--tp-heading-secondary);
+    color: var(--tp-common-white);
+}
+
+.basic-pagination ul li a, .basic-pagination ul li span {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    line-height: 38px;
+    text-align: center;
+    -webkit-border-radius: 50%;
+    -moz-border-radius: 50%;
+    -o-border-radius: 50%;
+    -ms-border-radius: 50%;
+    border-radius: 50%;
+    border: 1px solid #DCE1E8;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--tp-text-3);
+    -webkit-transition: all 0.2s ease-out 0s;
+    -moz-transition: all 0.2s ease-out 0s;
+    -ms-transition: all 0.2s ease-out 0s;
+    -o-transition: all 0.2s ease-out 0s;
+    transition: all 0.2s ease-out 0s;
+}
+.basic-pagination ul li a i, .basic-pagination ul li span i {
+    font-weight: 600;
+}
+.icon-chevrons-right:before {
+    content: "\f101";
+    font: normal normal normal 14px/1 FontAwesome;
+}

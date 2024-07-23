@@ -1,0 +1,36 @@
+
+/* Spacing */
+@media (max-width: 767.98px) {
+
+    .pl-50 {
+        padding-left: 10px;
+    }
+    .pr-50{
+        padding-right:10px;
+    }
+}
+
+/* Main css */
+@media (max-width: 767.98px) {
+body:{
+    width:100vw;
+    overflow:hidden;
+}
+}
+@media (hover:hover) {
+    a:hover {
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    body {
+      display: flex;
+    }
+  
+    #app {
+      display: grid;
+      padding: 0;
+      
+    }
+}
+
