@@ -304,7 +304,7 @@ input {
 	border: none;
 	bottom: -10%;
 	position: fixed;
-	right: 50px;
+	right: 12px;
 	&:hover {
 		opacity: 1;
 	}

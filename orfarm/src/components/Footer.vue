@@ -212,18 +212,29 @@ onBeforeUnmount(() => {
     </div>
 
     <!-- Scroll Top -->
-    <button
-      class="scroll-top scroll-to-target"
-      :class="{ open: isScrollOpen }"
-      data-target="html"
-      @click="scrollToTop"
-    >
-      <i class="icon-chevrons-up"></i>
-    </button>
+    <div class="button-container">
+  <button
+    class="scroll-top scroll-to-target"
+    :class="{ open: isScrollOpen }"
+    data-target="html"
+    @click="scrollToTop"
+  >
+    <i class="icon-chevrons-up"></i>
+  </button>
+  <div class="zalo-chat-widget" data-oaid="2060956194954401468"
+    data-welcome-message="Rất vui khi được hỗ trợ bạn!"
+    data-autopopup="0" data-width="" data-height="">
+  </div>
+</div>
+
   </footer>
 </template>
 
 <style scoped>
+.zalo-chat-widget{
+  bottom: 81px !important;
+  right: 9px !important;
+}
 .mainfeature__bg {
   background-image: url('../assets/img/shape/footer-shape-1.svg');
   background-repeat: repeat-x;
