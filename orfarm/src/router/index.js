@@ -14,7 +14,7 @@ import Register from '../views/Register.vue';
 import User from '../views/User.vue';
 import ForgotPassword from '../views/ForgotPassword.vue';
 import store from '../stores/auth.js';
-import { useStore} from "vuex"
+import { useStore } from "vuex";
 
 const routes = [
   {
@@ -47,6 +47,7 @@ const routes = [
     path: '/checkout',
     name: 'checkout',
     component: Checkout,
+    meta: { requiresAuth: true }
   },
   {
     path: '/login',
@@ -66,12 +67,12 @@ const routes = [
   {
     path: '/cart',
     name: 'cart',
-    component: Cart,
+    component: Cart
   },
   {
     path: '/wishlist',
     name: 'wishlist',
-    component: Wishlist,
+    component: Wishlist
   },
   {
     path: '/404',
@@ -82,6 +83,7 @@ const routes = [
     path: '/user',
     name: 'user',
     component: User,
+    meta: { requiresAuth: true }
   },
   {
     path: '/:catchAll(.*)',
@@ -96,7 +98,6 @@ const router = createRouter({
 
 const isAuthenticated = () => {
   const token = localStorage.getItem('token');
-  
   if (!token) {
     return false;
   }
@@ -112,10 +113,17 @@ const isAuthenticated = () => {
   }
 };
 
-router.beforeEach((to, from, next) => {
-  if (to.name !== 'login' && to.name!=='register' && !isAuthenticated()) {
+router.beforeEach(async (to, from, next) => {
+  const store1 = useStore();
+
+  const users = store1.state.user;
+
+  if (to.meta.requiresAuth && !isAuthenticated()) {
     next({ name: 'login' });
   } else {
+    if (!users || Object.keys(users).length === 0) {
+      await store1.dispatch('getUser');
+    }
     next();
   }
 });

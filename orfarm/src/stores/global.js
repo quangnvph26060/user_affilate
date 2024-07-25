@@ -28,22 +28,22 @@ const store = {
     },
     actions: {
         async getCart({commit, state}) {
-            const token = localStorage.getItem('token');
-            const headers = {
-                'accept': 'application/json',
-                'Authorization': 'Bearer '  + token
-            }
-            try {
-                const API_BACK_END = apiURL.baseURL;
-                if(token != "" && token != null){
-                    const { data } = await axios.get(`${API_BACK_END}cart`, {headers : headers});
-                    if (data.status == 'success') {
-                        commit('setCart', data.data);
-                    }
-                }
-            } catch ({ res }) {
-                commit('setCart', {});
-            }
+            // const token = localStorage.getItem('token');
+            // const headers = {
+            //     'accept': 'application/json',
+            //     'Authorization': 'Bearer '  + token
+            // }
+            // try {
+            //     const API_BACK_END = apiURL.baseURL;
+            //     if(token != "" && token != null){
+            //         const { data } = await axios.get(`${API_BACK_END}cart`, {headers : headers});
+            //         if (data.status == 'success') {
+            //             commit('setCart', data.data);
+            //         }
+            //     }
+            // } catch ({ res }) {
+            //     commit('setCart', {});
+            // }
         },
         async getProduct({commit, state}) {
             try {

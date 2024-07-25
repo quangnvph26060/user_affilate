@@ -80,8 +80,6 @@ const store = {
             commit('setAdmin', {});
             commit('SET_AUTHENTICATED', false);
             commit('setToken', '');
-            commit('setCart',{});
-
         }
     }
 };

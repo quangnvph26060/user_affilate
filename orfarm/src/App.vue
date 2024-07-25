@@ -14,7 +14,7 @@ watch(route, () => {
   isGrey.value = route.path === '/shop-left-sidebar';
 });
 
-store.dispatch('getProduct');
+// store.dispatch('getProduct');
 </script>
 
 <template>

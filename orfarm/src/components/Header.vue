@@ -8,8 +8,12 @@ import apiURL  from "../connect.js";
 import Auth from '@/api/auth/index.js';
 import axios from 'axios';
 import { Notyf } from 'notyf';
+import Cart from "../api/cart/cart.js";
 import 'notyf/notyf.min.css';
+import { useFormatCurrency } from "../composables/useFormatCurrency.js";
+const { getToCart, responseCart, clearCartUser,delToCart } = Cart();
 const notyf = new Notyf();
+
 const API_BACK_END_V1 =apiURL.baseURL;
 const{logout } = Auth();
 const router = useRouter();
@@ -25,7 +29,6 @@ const isSearchBarOpened = ref(false)
 const openSearchBar = () => {
   isSearchBarOpened.value = true
 }
-
 
 const globalStore = ref(store.state.global);
 
@@ -72,45 +75,32 @@ const toggleCartMenu = () => {
 }
  
 const openUserDetail = () => {
-  if (!store.state.auth.user || Object.keys(store.state.auth.user).length === 0) {
-    router.push({ name: 'login' });
-  }else{
-    router.push({name:'user'});
-  }
+  router.push({name:'user'});
 };
 
 const getImageUrl = (imagePath) => {
       return `${API_BACK_END}/${imagePath}`;
     };
-const formatCurrency = (value) => {
-  const formattedNumber = new Intl.NumberFormat('en-VN', {
-        style: 'decimal',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0
-      }).format(value);
-      return `${formattedNumber} VND`;
-};
 
-const deleteCart = async (id) => {
-    try {
-        const response = await axios.delete(`${API_BACK_END_V1}cart/${id}`);
-        if (response.data.status === 'success') {
-            store.dispatch('getCart');
-            await  notyf.success({
-					message: 'Đã xóa sản phẩm khỏi giỏ hàng!',
-					duration: 2000,
-					position: {
-						x: 'left',
-						y: 'top',
-					  },
-				  });
-        } else {
-            console.error('Failed to fetch product data');
-        }
+
+const data = ref('');
+onMounted(async()=>{
+  let token = localStorage.getItem('token');
+  if(token){
+    await getToCart();
+  }
+  data.value = responseCart.data;
+ 
+})
+const delProduct= async(id)=> {
+	 
+   try {
+      await delToCart(id);
     } catch (error) {
-        console.error('Error fetching product data:', error);
+      console.error('Error deleting product:', error);
     }
-};
+}
+  
 
 const goToShopDetail = (id) =>{ 
   router.push({ name: 'product-details',params: { product: id } });
@@ -180,15 +170,15 @@ onUnmounted(() => {
                            <div class="header__info-search tpcolor__purple ml-10">
                               <button class="tp-search-toggle"  @click="openSearchBar" ><i class="icon-search"></i></button>
                            </div>
-                           <div class="header__info-user tpcolor__yellow ml-10" @click="openUserDetail">
-                              <a href="#"><i class="icon-user"></i></a>
+                           <div class="header__info-user tpcolor__yellow ml-10" >
+                              <a href="/user"><i class="icon-user"></i></a>
                            </div>
                            <div class="header__info-wishlist tpcolor__greenish ml-10">
                               <a href="#"><i class="icon-heart icons"></i></a>
                            </div>
                            <div class="header__info-cart tpcolor__oasis ml-10 tp-cart-toggle" @click='toggleCartMenu'>
                               <button><i><img src="../assets/img/icon/cart-1.svg" alt=""></i>
-                                 <span>{{store.state?.global?.cart?.length??'0'}}</span>
+                                 <span>{{responseCart.data.length ?? '0'}}</span>
                               </button>
                            </div>
                         </div>
@@ -463,8 +453,9 @@ onUnmounted(() => {
                     <i class="icon-search"></i>
                   </button>
                 </div>  
-                <div class="header__info-user tpcolor__yellow ml-10" @click="openUserDetail">
-                  <a href="#"><i class="icon-user"></i></a>
+               
+                <div class="header__info-user tpcolor__yellow ml-10" >
+                  <a href="/user"><i class="icon-user"></i></a>
                 </div>
                 <div class="header__info-wishlist tpcolor__greenish ml-10">
                   <a href="wishlist.html"><i class="icon-heart icons"></i></a>
@@ -472,7 +463,7 @@ onUnmounted(() => {
                 <div class="header__info-cart tpcolor__oasis ml-10 tp-cart-toggle"  @click='toggleCartMenu'>
                   <button class="header__info-button">
                     <i><img src="../assets/img/icon/cart-1.svg" alt="" /></i>
-                    <span>{{store.state?.global?.cart?.length??'0'}}</span>
+                    <span >{{responseCart.data.length ?? '0'}}</span>
                   </button>
                 </div>
               </div>
@@ -491,8 +482,8 @@ onUnmounted(() => {
           <h4 class="tpcart__title">Giỏ Hàng của bạn</h4>
           <div class="tpcart__product">
              <div class="tpcart__product-list">
-              <ul>
-                <li v-for="item in store.state.global.cart" :key="item.id">
+              <ul v-if="responseCart.data.length > 0">
+                <li v-for="item in responseCart.data" :key="item.id">
                   <div class="tpcart__item">
                     <div class="tpcart__img">
                       <img :src="getImageUrl(item.product.images[0].image_path)" alt="" />
@@ -503,10 +494,10 @@ onUnmounted(() => {
                       </span>
                       <div class="tpcart__cart-price">
                         <span class="quantity">{{ item.amount }} x </span>
-                        <span class="new-price">{{ formatCurrency(item.product.price) }}</span>
+                        <span class="new-price">{{ useFormatCurrency(item.product.price) }}</span>
                       </div>
                       <div class="tpcart__del">
-                        <a href="#" @click.prevent='deleteCart(item.id)'><i class="icon-x-circle"></i></a>
+                        <a href="#" @click.prevent='delProduct(item.id)'><i class="icon-x-circle"></i></a>
                       </div>
                     </div>
                   </div>
@@ -516,7 +507,7 @@ onUnmounted(() => {
              <div class="tpcart__checkout">
                 <div class="tpcart__total-price d-flex justify-content-between align-items-center">
                    <span> Tổng Tiền:</span>
-                   <span class="heilight-price"> {{ formatCurrency(total) }}</span>
+                   <span class="heilight-price"> {{ useFormatCurrency(responseCart.total) }}</span>
                 </div>
                 <div class="tpcart__checkout-btn">
                    <a class="tpcart-btn mb-10" href="#" @click.prevent="routeForward('cart')" >Xem Giỏ Hàng</a>

@@ -8,6 +8,15 @@ import HomeReviewSlider from '@/components/HomeReviewSlider.vue'
 import HomeCartArea from '@/components/HomeCartArea.vue'
 import HomeBlogArea from '@/components/HomeBlogArea.vue'
 import store from '../stores/index.js'
+import Product from '../api/product/product.js'
+import { ref, computed, onMounted } from 'vue'
+const {getProduct, responseProduct, findProduct, searchProduct} = Product();
+const data = ref([]);
+onMounted(async()=>{
+  await getProduct();
+  data.value =  responseProduct.data;
+ 
+})
 </script>
 
 <template>
@@ -80,7 +89,7 @@ import store from '../stores/index.js'
    </div>
 </section>
  <!-- HomePage Weekly Product -->
-         <ProductSlider title='Sản phẩm Hot' option='Xem tất cả' fullscreen='' :hasProcess="true" :slideOnShow='5' :products='store.state.global.product'/>
+         <ProductSlider title='Sản phẩm Hot' option='Xem tất cả' fullscreen='' :hasProcess="true" :slideOnShow='5' :products='data'/>
          <HomeBannerSection/>
          <HomeBigBannerSection/>
          <HomeBrandProduct :brandId="1"/>

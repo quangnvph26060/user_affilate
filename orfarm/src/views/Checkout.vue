@@ -4,9 +4,41 @@ import {reactive,  ref, onMounted, computed} from 'vue'
 import auth from '../stores/auth.js'
 import store from '../stores/global.js';
 import axios from 'axios';
+import { useStore } from "vuex"
+import Order from "../api/order/order.js";
+import { useFormatCurrency } from "../composables/useFormatCurrency.js";
+import Cart from "../api/cart/cart.js";
+const { submitOrder } = Order();
+const { getToCart, responseCart, clearCartUser } = Cart();
 
 const breadCrumbPath = [{ route: '/', name: 'Trang chủ' }, { name: 'Thanh toán' }]
+const store1 = useStore();
+const data_user = ref('');
+const data_cart = ref('');
+const total_money = ref('');
+const imageBank = ref("");
+const name = ref('');
+const phone = ref("");
+const address = ref("");
+const email = ref("");
+const data = ref([]);
+onMounted(async()=>{
+  const user = computed(() => store1.getters['user']);
+  const admin = computed(() => store1.getters['admin']);
+  if(user){
+      name.value = user.value.name;
+      phone.value = user.value.phone;
+      address.value = user.value.address;
+      email.value = user.value.email;
+  }
 
+  if (admin) {
+		imageBank.value = admin.value.user_info[0].branch;
+	}
+  await getToCart();
+  data_cart.value =  responseCart.data;
+  total_money.value = responseCart.total;
+})
 const isShowLogin = ref(false);
 const isShowCoupon = ref(false);
 const cities = ref([]);
@@ -87,24 +119,104 @@ const onDistrictChange = (event) => {
       form.billingDetails.ward = null;
       wards.value = selectedDistrict ? selectedDistrict.Wards : [];
 };
-const formatCurrency = (value) => {
-  const formattedNumber = new Intl.NumberFormat('en-VN', {
-        style: 'decimal',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0
-      }).format(value);
-      return `${formattedNumber} VND`;
-    };
 
-    const total = computed(() => {
-  let totalValue = 0;
-  globalStore.value.cart.forEach(item => {
-    totalValue += item.product.price * item.amount;
-  });
-  return totalValue;
-});
 
 onMounted(fetchLocationData);
+const randomUpperCase = ref("");
+const isModalVisible = ref(false);
+
+const showModal = () => {
+  if(!validateFormOder()){
+    return;
+  }
+  var result = "";
+	var characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	var charactersLength = characters.length;
+  for (var i = 0; i < 8; i++) {
+	  var randomIndex = Math.floor(Math.random() * charactersLength);
+	  var randomChar = characters.charAt(randomIndex);
+	  result += randomChar;
+	}
+  
+	randomUpperCase.value = result;
+  
+	if (responseCart.data.length > 0) {
+	  isModalVisible.value = true;
+	}
+  isModalVisible.value = true;
+
+};
+const hideModal = () => {
+
+  isModalVisible.value = false;
+}
+const isLoading = ref(false);
+const error = reactive({
+  name:"",
+  address: "",
+  phone: '',
+  list_product: [],
+  zip_code: '',
+  total_money: 0,
+  email:"",
+  
+});
+function validateFormOder (){
+  let is_flag = true;
+  error.email = false;
+  error.address = false;
+  error.name = false;
+  error.phone = false;
+  if(total_money.value <= 0){
+    alert('Vui lòng thêm sản phẩm vào giỏ hàng!')
+  }
+  if(name.value === ""){
+    error.name = true;
+    is_flag = false;
+  }
+  if(email.value === ""){
+    error.email = true;
+    is_flag = false;
+  }else{
+    error.email = false;
+  }
+  if(phone.value === ""){
+    error.phone = true;
+    is_flag = false;
+  }
+  
+  if(address.value === null || address.value === ""){
+    error.address = true;
+    is_flag = false;
+  }
+  return is_flag;
+}
+const handleOk = async () => {
+   
+	  isLoading.value  = true;
+    const formDataOrder = {
+      name: name.value,
+      receive_address: address.value,
+      phone: phone.value,
+      list_product: data_cart.value,
+      zip_code: randomUpperCase.value,
+      total_money: responseCart.total,
+    };
+   
+    try{
+      await submitOrder(formDataOrder);
+      await clearCartUser();
+      isModalVisible.value = false;
+    }catch (error){
+    } finally {
+      isLoading.value = false;
+    }
+  };
+const handleCancel = () => {
+	isModalVisible.value = false;
+  };
+ 
+
 </script>
 
 <template>
@@ -173,18 +285,14 @@ onMounted(fetchLocationData);
           <div class="checkbox-form">
             <h3>Chi tiết thanh toán</h3>
             <div class="row">
-              <div class="col-md-6">
+              <div class="col-md-12">
                 <div class="checkout-form-list">
-                  <label>Tên <span class="required">*</span></label>
-                  <input type="text" v-model="form.billingDetails.firstName">
+                  <label>Họ và tên <span class="required">*</span></label>
+                  <input type="text" v-model="name"  :class="{'is-invalid': error.name}">
+                  <span v-if="error.name" class="error-message">Tên không được bỏ trống</span>
                 </div>
               </div>
-              <div class="col-md-6">
-                <div class="checkout-form-list">
-                  <label>Họ <span class="required">*</span></label>
-                  <input type="text" v-model="form.billingDetails.lastName">
-                </div>
-              </div>
+             
               <div class="col-md-12">
                 <div class="country-select">
                   <label>Tỉnh/Thành Phố <span class="required">*</span></label>
@@ -212,19 +320,22 @@ onMounted(fetchLocationData);
               <div class="col-md-12">
                 <div class="checkout-form-list">
                   <label>Địa chỉ <span class="required">*</span></label>
-                  <input type="text" placeholder="Địa chỉ đường" v-model="form.billingDetails.address">
+                  <input type="text" placeholder="Địa chỉ đường" v-model="address" :class="{'is-invalid': error.address}">
+                  <span v-if="error.address" class="error-message"> Địa chỉ không được bỏ trống </span>
                 </div>
               </div>
               <div class="col-md-6">
                 <div class="checkout-form-list">
                   <label>Địa chỉ email <span class="required">*</span></label>
-                  <input type="email" v-model="form.billingDetails.email">
+                  <input type="email" v-model="email" :class="{'is-invalid': error.email}">
+                   <span v-if="error.email" class="error-message"> Email không được bỏ trống </span>
                 </div>
               </div>
               <div class="col-md-6">
                 <div class="checkout-form-list">
                   <label>Số điện thoại <span class="required">*</span></label>
-                  <input type="text" v-model="form.billingDetails.phone">
+                  <input type="text" v-model="phone" :class="{'is-invalid': error.phone}">
+                  <span v-if="error.phone" class="error-message"> Số điện thoại không được bỏ trống </span>
                 </div>
               </div>
               <div class="col-md-12">
@@ -345,12 +456,12 @@ onMounted(fetchLocationData);
                                           </tr>
                                        </thead>
                                        <tbody>
-                                        <tr v-for="(item, index) in store.state.cart" :key="index" class="cart_item">
+                                        <tr v-for="(item, index) in data_cart" :key="index" class="cart_item">
                                           <td class="product-name">
                                             {{ item.product.name }} <strong class="product-quantity"> × {{ item.amount }}</strong>
                                           </td>
                                           <td class="product-total">
-                                            <span class="amount">{{ formatCurrency(item.amount*item.product.price) }}</span>
+                                            <span class="amount">{{ useFormatCurrency(item.amount*item.product.price) }}</span>
                                           </td>
                                         </tr>
                                       </tbody>
@@ -375,7 +486,7 @@ onMounted(fetchLocationData);
                                           </tr>
                                           <tr class="order-total">
                                                 <th>Tổng tiền</th>
-                                                <td><strong><span class="amount">{{total}}</span></strong>
+                                                <td><strong><span class="amount">{{useFormatCurrency(total_money)}}</span></strong>
                                                 </td>
                                           </tr>
                                        </tfoot>
@@ -421,18 +532,84 @@ onMounted(fetchLocationData);
       </div>
    </div>
    <div class="order-button-payment mt-20">
-      <button type="submit" class="tp-btn tp-color-btn w-100 banner-animation">Đặt hàng</button>
+      <button type="submit" class="tp-btn tp-color-btn w-100 banner-animation"  @click="showModal">Đặt hàng</button>
    </div>
+  
 </div>
 
-                           </div>
+          </div>
+          
             </div>
           </div>
+          
         </form>
+        <div v-if="isModalVisible" class="modal-overlay" @click="hideModal">
+      <div class="modal-text" @click.stop>
+         <h4>Thanh toán</h4>
+         <img :src="imageBank" alt="Hình ảnh" style="width: 80%;" />
+         <p style="text-align: center">
+           Nội dung chuyển khoản:
+           <span class="font-weight-bold">{{ randomUpperCase }}</span>
+         </p>
+         <div class="button-container">
+            <button class="btn bg-green" @click="handleOk">Xác nhận</button>
+         </div>
+      </div>
+   </div>
       </div>
     </section>
   </template>
 <style scoped>
+.modal-overlay {
+   position: fixed;
+   top: 0;
+   left: 0;
+   width: 100%;
+   height: 100%;
+   background: rgba(0, 0, 0, 0.5);
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   z-index: 1000;
+}
+
+.modal-text {
+   background: white;
+   padding: 20px;
+   border-radius: 5px;
+   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   text-align: center;
+}
+
+.button-container {
+   width: 100%;
+   display: flex;
+   justify-content: flex-end;
+}
+
+.btn.bg-green {
+  background-color: var(--tp-heading-secondary);
+   color: white;
+   border: none;
+   padding: 10px 20px;
+   border-radius: 5px;
+   cursor: pointer;
+}
+
+.btn.bg-green:hover {
+   background-color: darkgreen;
+}
+.error-message {
+   color: red;
+   font-size: 12px;
+}
+.is-invalid {
+   border: 2px solid red  !important;
+   border-radius: 4px;
+}
 .coupon-accordion h3 {
     background-color: #f6f6f6;
     border-top: 3px solid rgba(150, 174, 0, 0.3);
