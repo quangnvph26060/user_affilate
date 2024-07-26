@@ -37,8 +37,7 @@ export default function Order() {
         try {
             const  response  = await axios.post(`${API_BACK_END}createorder`,formDataOrder, { headers: headers });
                 if(response.data.status === 'success'){
-                  //  await router.push({ name: 'InformationLine' })
-                  alert('đơn hàng của bản đã được đặt thành công ')
+                    await router.push({ name: 'InformationLine' })
                 }
         } catch (error) {
 			throw handleError(error);
@@ -50,21 +49,16 @@ export default function Order() {
                 if(response.data.status === 'success'){
                     responseOrder.data = response.data.data.orders
                     responseOrder.count = response.data.data.orderCount
-                    console.log(responseOrder.data);
                 }
         } catch (error) {
 			throw handleError(error);
         }
     }
     const orderDetail = async () => {
-        const headers = {
-            'accept': 'application/json',
-            'Authorization': 'Bearer ' + localStorage.getItem('token')
-        }
         try {
             const response  = await axios.get(`${API_BACK_END}order-detail`, { headers: headers });
                 if(response.data.status === 'success'){
-                     responseOrderDetail.data = response.data.data
+                    responseOrderDetail.data = response.data.data
                 }
         } catch (error) {
 			throw handleError(error);

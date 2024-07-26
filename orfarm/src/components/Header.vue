@@ -14,7 +14,8 @@ import { useFormatCurrency } from "../composables/useFormatCurrency.js";
 const { getToCart, responseCart, clearCartUser,delToCart } = Cart();
 const notyf = new Notyf();
 
-const API_BACK_END_V1 =apiURL.baseURL;
+const URL_AFFILATE = apiURL.URL_AFFILATE;
+
 const{logout } = Auth();
 const router = useRouter();
 const API_BACK_END = apiURL.URL;
@@ -131,7 +132,7 @@ onUnmounted(() => {
           <div class="col-lg-6 col-md-12">
             <div class="header__top-right d-flex align-items-center">
               <div class="header__top-link">
-                <a href="#">Vị trí cửa hàng</a>
+                <a :href="URL_AFFILATE">Tham gia công tác viên</a>
                 <a href="#">Theo dõi đơn hàng</a>
                 <a href="faq.html">FAQs</a>
               </div> 

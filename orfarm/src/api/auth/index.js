@@ -435,6 +435,23 @@ export default function Auth() {
 			throw handleError(error);
         }
 	}
+	const FormEdituser = reactive({
+        phone: '',
+        name: '',
+		address: '',
+    });
+	const editUser = async (FormEdituser) => {
+		const headers = {
+            'accept': 'application/json',
+            'Authorization': 'Bearer ' + localStorage.getItem('token')
+        }
+		try {
+            const response  = await axios.post(`${API_BACK_END}edit-user`,FormEdituser, { headers: headers });
+
+        } catch (error) {
+			throw handleError(error);
+        }
+	}
 	return {
 		loginForm,
 		submitLogin,
@@ -449,5 +466,7 @@ export default function Auth() {
 		submitOtp,
 		resetPasswordForm,
 		submitNewPassword,
+		FormEdituser,
+		editUser
 	}
 }

@@ -8,6 +8,8 @@ import { useStore } from "vuex"
 import Order from "../api/order/order.js";
 import { useFormatCurrency } from "../composables/useFormatCurrency.js";
 import Cart from "../api/cart/cart.js";
+import { Notyf } from 'notyf';
+const notyf = new Notyf();
 const { submitOrder } = Order();
 const { getToCart, responseCart, clearCartUser } = Cart();
 
@@ -21,6 +23,7 @@ const name = ref('');
 const phone = ref("");
 const address = ref("");
 const email = ref("");
+const ward = ref("");
 const data = ref([]);
 onMounted(async()=>{
   const user = computed(() => store1.getters['user']);
@@ -167,8 +170,16 @@ function validateFormOder (){
   error.address = false;
   error.name = false;
   error.phone = false;
-  if(total_money.value <= 0){
-    alert('Vui lòng thêm sản phẩm vào giỏ hàng!')
+  if(responseCart.data.length <= 0){
+      notyf.error({
+					message: 'Thêm sản phẩm vào giỏ hàng thành công!',
+					duration: 2000,
+					position: {
+						x: 'right',
+						y: 'top',
+					  },
+				  });
+    is_flag = false;
   }
   if(name.value === ""){
     error.name = true;
@@ -192,7 +203,6 @@ function validateFormOder (){
   return is_flag;
 }
 const handleOk = async () => {
-   
 	  isLoading.value  = true;
     const formDataOrder = {
       name: name.value,
@@ -456,7 +466,7 @@ const handleCancel = () => {
                                           </tr>
                                        </thead>
                                        <tbody>
-                                        <tr v-for="(item, index) in data_cart" :key="index" class="cart_item">
+                                        <tr v-for="(item, index) in responseCart.data" :key="index" class="cart_item">
                                           <td class="product-name">
                                             {{ item.product.name }} <strong class="product-quantity"> × {{ item.amount }}</strong>
                                           </td>
@@ -552,7 +562,8 @@ const handleCancel = () => {
            <span class="font-weight-bold">{{ randomUpperCase }}</span>
          </p>
          <div class="button-container">
-            <button class="btn bg-green" @click="handleOk">Xác nhận</button>
+            <button class="btn bg-green" @click="handleOk" v-if="!isLoading">Xác nhận</button>
+            <button class="btn bg-green" v-else>Loading...</button>
          </div>
       </div>
    </div>

@@ -89,7 +89,7 @@ onMounted(async()=>{
    </div>
 </section>
  <!-- HomePage Weekly Product -->
-         <ProductSlider title='Sản phẩm Hot' option='Xem tất cả' fullscreen='' :hasProcess="true" :slideOnShow='5' :products='data'/>
+         <ProductSlider title='Sản phẩm Hot' option='Xem tất cả ' fullscreen='' :hasProcess="true" :slideOnShow='5' :products='data'/>
          <HomeBannerSection/>
          <HomeBigBannerSection/>
          <HomeBrandProduct :brandId="1"/>

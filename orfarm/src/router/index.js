@@ -50,6 +50,11 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
+    path: "/information-line",
+    name: "InformationLine",
+    component: () => import("../views/Success.vue"),
+  },
+  {
     path: '/login',
     name: 'login',
     component: LogIn

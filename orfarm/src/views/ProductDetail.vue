@@ -38,7 +38,6 @@ const fetchProduct = async () => {
     try {
         const response = await axios.post(`${API_BACK_END}products/${productId}`);
         if (response.data.status === 'success') {
-            console.log(response.data.data);
             return response.data.data;
         } else {
             console.error('Failed to fetch product data');
@@ -139,7 +138,7 @@ onMounted(async () => {
                                               <img :src="`${API_BACK_END_SUB}/${image?.image_path}`" :alt="image?.description" class='tpproduct-details__nab--image'>
                                               <div class="tpproduct__info bage">
                                                 <span class="tpproduct__info-hot bage__hot">HOT</span>
-                                                <span class="tpproduct__info-discount bage__discount" style='margin-left:5px;'>-90%</span>
+                                                <span class="tpproduct__info-discount bage__discount" style='margin-left:5px;'>{{ productInfor.commission_rate }}%</span>
                                               </div>
                                             </div>
                                     

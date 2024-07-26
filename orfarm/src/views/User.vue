@@ -3,39 +3,67 @@ import BreadCrumb from '@/components/BreadCrumb.vue'
 import SideBannerAuth from '@/components/SideBannerAuth.vue'
 import Auth from '@/api/auth/index.js';
 import { useRouter } from "vue-router";
-import { computed, reactive} from 'vue';
+import { computed, reactive, ref} from 'vue';
 import axios from 'axios';
 import { config } from '@/config/config';
 import store from '../stores/index.js';
 const router = useRouter();
-const{loginForm, submitLogin, errors, resultOtp,submitResgiter } = Auth();
+const {  editUser } = Auth();
 
 const breadCrumbPath = [{ route: '/', name: 'Trang chủ' }, { name: 'Thông tin người dùng' }];
 const user = computed(() => store.state.auth.user);
-const form = reactive({
-    name : user.value.name,
-    address : user.value.address,
-    phone : user.value.phone,
-});
+const name = ref('');
+const phone = ref('');
+const address = ref('');
 
-const updateUserInfor = async (id) => {
+name.value= user.value.name;
+address.value= user.value.address;
+phone.value= user.value.phone;
+
+const errors = ref({
+    name: '',
+    phone: '',
+    address: ''
+});
+const validateForm = () => {
+    let isValid = true;
+    errors.value.name = '';
+    errors.value.phone = '';
+    errors.value.address = '';
+
+    if (!name.value) {
+        errors.value.name = 'Tên không được để trống!';
+        isValid = false;
+    }
+
+    if (!phone.value) {
+        errors.value.phone = 'Số điện thoại không được để trống!';
+        isValid = false;
+    } else if (!/^\d+$/.test(phone.value)) {
+        errors.value.phone = 'Số điện thoại phải là số!';
+        isValid = false;
+    }
+
+    if (!address.value) { // Corrected this line
+        errors.value.address = 'Địa chỉ không được để trống!';
+        isValid = false;
+    }
+
+    return isValid;
+};
+const saveInfo = async () => {
+    if (!validateForm()) {
+        return;
+    }
+    const FormEdituser = {
+      name: name.value,
+      phone: phone.value,
+      address: address.value
+    };
     try {
-        const response = await axios.put(`${API_BACK_END_V1}user/${id}`);
-        if (response.data.status === 'success') {
-            store.dispatch('getUser');
-            await  notyf.success({
-					message: 'Đã sửa thông tin thành công!',
-					duration: 2000,
-					position: {
-						x: 'right',
-						y: 'top',
-					  },
-				  });
-        } else {
-            console.error('Failed to update data');
-        }
+      await editUser(FormEdituser);
     } catch (error) {
-        console.error('Error update data:', error);
+        console.error('Failed to save user info:', error);
     }
 };
 </script>
@@ -64,35 +92,35 @@ const updateUserInfor = async (id) => {
                   </div>
                 </div>
                 <div class="tptrack__login mb-10">
-                  <form @submit.prevent="updateUserInfo">
-                    <div class="tptrack_input">
-                      <label for="name">Họ và tên:</label>
-                      <div class="tptrack__email mb-1">
-                        <span><i class="fal fa-user"></i> </span>
-                        <input type="text" placeholder="Họ và tên" name="name" v-model="form.name" />
-                      </div>
-                      <span class="text-danger error_message" v-if="errors.name">{{ errors.name }}</span>
-                    </div>
-                    <div class="tptrack_input">
-                      <label for="phone">Số điện thoại:</label>
-                      <div class="tptrack__email tptrack__normal mb-1">
-                        <input type="text" placeholder="Số điện thoại" name="phone" v-model="form.phone" />
-                      </div>
-                      <span class="text-danger error_message" v-if="errors.phone">{{ errors.phone }}</span>
-                    </div>
-                    <div class="tptrack_input">
-                      <label for="address">Địa chỉ:</label>
-                      <div class="tptrack__email tptrack__normal mb-1">
-                        <input type="text" placeholder="Địa chỉ" name="address" v-model="form.address" />
-                      </div>
-                      <span class="text-danger error_message" v-if="errors.address">{{ errors.address }}</span>
-                    </div>
-                    <div class="tptrack__btn">
-                      <button class="tptrack__submition active" type="submit">
-                        Cập nhật thông tin<i class="fal fa-long-arrow-right"></i>
-                      </button>
-                    </div>
-                  </form>
+                  <form @submit.prevent="saveInfo">
+    <div class="tptrack_input">
+        <label for="name">Họ và tên:</label>
+        <div class="tptrack__email mb-1">
+            <span><i class="fal fa-user"></i> </span>
+            <input type="text" placeholder="Họ và tên" name="name" v-model="name" />
+        </div>
+        <span class="text-danger error_message" v-if="errors.name">{{ errors.name }}</span>
+    </div>
+    <div class="tptrack_input">
+        <label for="phone">Số điện thoại:</label>
+        <div class="tptrack__email tptrack__normal mb-1">
+            <input type="text" placeholder="Số điện thoại" name="phone" v-model="phone" />
+        </div>
+        <span class="text-danger error_message" v-if="errors.phone">{{ errors.phone }}</span>
+    </div>
+    <div class="tptrack_input">
+        <label for="address">Địa chỉ:</label>
+        <div class="tptrack__email tptrack__normal mb-1">
+            <input type="text" placeholder="Địa chỉ" name="address" v-model="address" />
+        </div>
+        <span class="text-danger error_message" v-if="errors.address">{{ errors.address }}</span>
+    </div>
+    <div class="tptrack__btn">
+        <button class="tptrack__submition active" type="submit">
+            Cập nhật thông tin<i class="fal fa-long-arrow-right"></i>
+        </button>
+    </div>
+</form>
                 </div>
               </div>
             </div>

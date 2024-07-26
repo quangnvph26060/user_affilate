@@ -82,13 +82,13 @@ const discountPrice = (price, discount) => {
 };
 
 const formatCurrency = (value) => {
-  const formattedNumber = new Intl.NumberFormat('en-VN', {
-        style: 'decimal',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0
-      }).format(value);
-      return `${formattedNumber} VND`;
-    };
+   const formattedNumber = new Intl.NumberFormat('en-VN', {
+   style: 'decimal',
+   minimumFractionDigits: 0,
+   maximumFractionDigits: 0
+   }).format(value);
+   return `${formattedNumber} VND`;
+};
     const getImageUrl = (imagePath) => {
       return `${API_BACK_END}/${imagePath}`;
     };
@@ -127,7 +127,9 @@ const formatCurrency = (value) => {
                 </nav>
                 </div>
                 <div class="tpproduct__all-item" v-else>
-                <a href="#">Xem tất cả <i class="icon-chevron-right"></i></a>
+                <a href="#">Xem tất cả 
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m8 4l8 8l-8 8"/></svg>
+               </a>
                 </div>
             </div>
                   </div>
@@ -151,9 +153,9 @@ const formatCurrency = (value) => {
                                  <div class="tpproduct p-relative tpprogress__hover">
                                     <div class="tpproduct__thumb p-relative text-center">
                                         <a href="#"><img :src="getImageUrl(product.images[0]?.image_path)" alt=""></a>
-                                        <a class="tpproduct__thumb-img"  :href="'product-details/' + product.id" ><img :src="getImageUrl(product.images[0]?.image_path)" alt=""></a>
+                                        <a class="tpproduct__thumb-img"  :href="product.id" ><img :src="getImageUrl(product.images[0]?.image_path)" alt=""></a>
                                         <div class="tpproduct__info bage">
-                                            <span class="tpproduct__info-discount bage__discount">-50%</span>
+                                            <span class="tpproduct__info-discount bage__discount">-{{product.commission_rate}}%</span>
                                             <span class="tpproduct__info-hot bage__hot">HOT</span>
                                         </div>
                                         <div class="tpproduct__shopping">
@@ -184,7 +186,7 @@ const formatCurrency = (value) => {
                                             <div class="progress">
                                                 <div class="progress-bar w-25" role="progressbar" aria-label="Basic example" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
                                             </div>
-                                            <span>Bán được: <b>16/{{product.quantity}}</b></span>
+                                            <span>Số lượng: <b>{{product.quantity}}</b></span>
                                         </div>
                                     </div>
                                     <div class="tpproduct__hover-text">

@@ -1,5 +1,8 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue'
+import Category from '@/api/category/category';
+const {getCategory, responseData  } = Category();
+
 const props = defineProps({
   isHomePage: Boolean,
   isGrey:Boolean,
@@ -23,7 +26,9 @@ const scrollToTop = () => {
     window.scrollTo(0, currentScroll - currentScroll / 20);
   }
 };
-
+onMounted(async()=>{
+  await getCategory();
+})
 onMounted(() => {
   window.addEventListener('scroll', handleScroll)
 })
@@ -145,11 +150,7 @@ onBeforeUnmount(() => {
                 <h4 class="tpfooter__widget-title">DANH MỤC HOT</h4>
                 <div class="tpfooter__widget-links">
                   <ul>
-                    <li><a href="#">Trái cây & Rau củ</a></li>
-                    <li><a href="#">Sản phẩm sữa</a></li>
-                    <li><a href="#">Thực phẩm đóng gói</a></li>
-                    <li><a href="#">Đồ uống</a></li>
-                    <li><a href="#">Sức khỏe & Sắc đẹp</a></li>
+                    <li v-for="(item,index) in responseData.data"> <a href="#" :key="item.index">{{item.name}}</a> </li>
                   </ul>
                 </div>
               </div>
