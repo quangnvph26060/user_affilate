@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import App from '../App.vue';
 import ProductDetail from '../views/ProductDetail.vue';
+import ProductList from '../views/ProductList.vue';
 import ShopLeftSidebar from '../views/ShopLeftSidebar.vue';
 import Blog from '../views/Blog.vue';
 import BlogDetails from '../views/BlogDetails.vue';
@@ -26,6 +27,12 @@ const routes = [
     path: '/product-details/:product',
     name: 'product-details',
     component: ProductDetail,
+    props: true
+  },
+  {
+    path: '/product-list',
+    name: 'product-list',
+    component: ProductList,
     props: true
   },
   {

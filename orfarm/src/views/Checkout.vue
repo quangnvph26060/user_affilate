@@ -56,7 +56,7 @@ const form = reactive({
   },
   coupon: '',
   billingDetails: {
-    province: 'Hà Nội',
+    province: '',
     district: '',
     ward: '',
     firstName: '',
@@ -129,6 +129,9 @@ const randomUpperCase = ref("");
 const isModalVisible = ref(false);
 
 const showModal = () => {
+    // Truy cập giá trị đã chọn từ thẻ select
+const selectedProvince = form.billingDetails.district;
+console.log(selectedProvince); 
   if(!validateFormOder()){
     return;
   }
@@ -162,6 +165,7 @@ const error = reactive({
   zip_code: '',
   total_money: 0,
   email:"",
+  province:"",
   
 });
 function validateFormOder (){
@@ -170,6 +174,7 @@ function validateFormOder (){
   error.address = false;
   error.name = false;
   error.phone = false;
+  error.province = false;
   if(responseCart.data.length <= 0){
       notyf.error({
 					message: 'Thêm sản phẩm vào giỏ hàng thành công!',
@@ -184,13 +189,43 @@ function validateFormOder (){
   if(name.value === ""){
     error.name = true;
     is_flag = false;
+    const nameInput = document.querySelector('.is-invalid');
+    if (nameInput) {
+      nameInput.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   }
+  if(form.billingDetails.province === ""){
+    error.province = true;
+    is_flag = false;
+    const nameInput = document.querySelector('.is-invalid');
+    if (nameInput) {
+      nameInput.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+  if(form.billingDetails.district === ""){
+    error.province = true;
+    is_flag = false;
+    const nameInput = document.querySelector('.is-invalid');
+    if (nameInput) {
+      nameInput.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+  if(form.billingDetails.ward === ""){
+    error.province = true;
+    is_flag = false;
+    const nameInput = document.querySelector('.is-invalid');
+    if (nameInput) {
+      nameInput.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
   if(email.value === ""){
     error.email = true;
     is_flag = false;
   }else{
     error.email = false;
   }
+
   if(phone.value === ""){
     error.phone = true;
     is_flag = false;
@@ -203,6 +238,9 @@ function validateFormOder (){
   return is_flag;
 }
 const handleOk = async () => {
+    if(!validateFormOder()){
+      return;
+    }
 	  isLoading.value  = true;
     const formDataOrder = {
       name: name.value,
@@ -211,6 +249,7 @@ const handleOk = async () => {
       list_product: data_cart.value,
       zip_code: randomUpperCase.value,
       total_money: responseCart.total,
+      payment_method:shippingMethod.value,
     };
    
     try{
@@ -225,7 +264,10 @@ const handleOk = async () => {
 const handleCancel = () => {
 	isModalVisible.value = false;
   };
- 
+  const shippingMethod = ref(1);
+  const handleshippingMethod = (event) => {
+    shippingMethod.value = parseInt(event.target.value);
+  }
 
 </script>
 
@@ -298,7 +340,7 @@ const handleCancel = () => {
               <div class="col-md-12">
                 <div class="checkout-form-list">
                   <label>Họ và tên <span class="required">*</span></label>
-                  <input type="text" v-model="name"  :class="{'is-invalid': error.name}">
+                  <input type="text" v-model="name"  :class="{'is-invalid': error.name}" ref="nameInput">
                   <span v-if="error.name" class="error-message">Tên không được bỏ trống</span>
                 </div>
               </div>
@@ -306,25 +348,28 @@ const handleCancel = () => {
               <div class="col-md-12">
                 <div class="country-select">
                   <label>Tỉnh/Thành Phố <span class="required">*</span></label>
-                  <select v-model="form.billingDetails.province" @change="onProvinceChange($event)">
+                  <select :class="{'is-invalid': error.province}" v-model="form.billingDetails.province" @change="onProvinceChange($event)">
                     <option v-for="province in cities" :value="province.Name" :data="province">{{province.Name}}</option>
                   </select>
+                  <span v-if="error.province" class="error-message">Tỉnh thành phố không được bỏ trống</span>
                 </div>
               </div>
               <div class="col-md-12">
                 <div class="country-select">
                   <label>Quận/Huyện <span class="required">*</span></label>
-                  <select v-model="form.billingDetails.district"   @change="onDistrictChange($event)">
+                  <select :class="{'is-invalid': error.districts}" v-model="form.billingDetails.district"   @change="onDistrictChange($event)">
                     <option v-for="district in districts" :value="district.Name">{{district.Name}}</option>
                   </select>
+                  <span v-if="error.districts" class="error-message">Quận/Huyện không được bỏ trống</span>
                 </div>
               </div>
               <div class="col-md-12">
                 <div class="country-select">
                   <label>Phường/Xã <span class="required">*</span></label>
-                  <select v-model="form.billingDetails.ward" >
+                  <select :class="{'is-invalid': error.ward}" v-model="form.billingDetails.ward" >
                     <option v-for="ward in wards" :value="ward.Name">{{ward.Name}}</option>
                   </select>
+                  <span v-if="error.ward" class="error-message">Phường/Xã không được bỏ trống</span>
                 </div>
               </div>
               <div class="col-md-12">
@@ -477,7 +522,7 @@ const handleCancel = () => {
                                       </tbody>
                                        <tfoot>
                                        
-                                          <tr class="shipping">
+                                          <!-- <tr class="shipping">
                                                 <th>Giao hàng</th>
                                                 <td>
                                                    <ul>
@@ -493,11 +538,26 @@ const handleCancel = () => {
                                                       </li>
                                                    </ul>
                                                 </td>
-                                          </tr>
+                                          </tr> -->
                                           <tr class="order-total">
-                                                <th>Tổng tiền</th>
-                                                <td><strong><span class="amount">{{useFormatCurrency(total_money)}}</span></strong>
-                                                </td>
+                                            <th>Tổng tiền</th>
+                                            <td><strong><span class="amount">{{useFormatCurrency(total_money)}}</span></strong>
+                                            </td>
+                                          </tr>
+                                          <tr class="shipping">
+                                            <th>Phương thức thanh toán</th>
+                                            <td>
+                                                <ul>
+                                                  <li>
+                                                    <input type="radio" name="shipping" @change="handleshippingMethod($event)" :v-model='form.shippingMethod' :value="1" checked>
+                                                    <label>Thanh toán chuyển khoản</label>
+                                                  </li>
+                                                  <li>
+                                                    <input type="radio" name="shipping" @change="handleshippingMethod($event)" :v-model='form.shippingMethod' :value="2">
+                                                    <label>Thanh toán khi nhận hàng </label>
+                                                  </li>
+                                                </ul>
+                                            </td>
                                           </tr>
                                        </tfoot>
                                     </table>
@@ -519,16 +579,21 @@ const handleCancel = () => {
       <div class="accordion-item">
          <h2 class="accordion-header" id="paymentTwo">
             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#payment" aria-expanded="false" aria-controls="payment">
-            Thanh toán bằng séc
+            Thanh toán khi nhận hàng
             </button>
          </h2>
          <div id="payment" class="accordion-collapse collapse" aria-labelledby="paymentTwo" data-bs-parent="#checkoutAccordion">
             <div class="accordion-body">
-            Vui lòng gửi séc của bạn đến Tên cửa hàng, Đường phố cửa hàng, Thị trấn cửa hàng, Bang / Quận cửa hàng, Mã bưu điện cửa hàng.
+              <p>Để sử dụng hình thức thanh toán khi nhận hàng, quý khách vui lòng lưu ý các thông tin sau:</p>
+              <ul>
+                  <li>Thanh toán khi nhận hàng chỉ áp dụng cho các đơn hàng trong khu vực giao hàng nội thành.</li>
+                  <li>Vui lòng chuẩn bị đủ tiền mặt để thanh toán cho nhân viên giao hàng khi nhận được đơn hàng của mình.</li>
+                  <li>Đội ngũ giao hàng sẽ liên hệ trước khi giao hàng để xác nhận thông tin và thời gian giao hàng.</li>
+              </ul>
             </div>
          </div>
       </div>
-      <div class="accordion-item">
+      <!-- <div class="accordion-item">
          <h2 class="accordion-header" id="paypalThree">
             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#paypal" aria-expanded="false" aria-controls="paypal">
             PayPal
@@ -539,10 +604,10 @@ const handleCancel = () => {
             Thanh toán qua PayPal; bạn có thể thanh toán bằng thẻ tín dụng nếu bạn không có tài khoản PayPal.
             </div>
          </div>
-      </div>
+      </div> -->
    </div>
    <div class="order-button-payment mt-20">
-      <button type="submit" class="tp-btn tp-color-btn w-100 banner-animation"  @click="showModal">Đặt hàng</button>
+    <button type="submit" class="tp-btn tp-color-btn w-100 banner-animation" @click="shippingMethod === 1 ? showModal() : handleOk()">Đặt hàng</button>
    </div>
   
 </div>
@@ -563,7 +628,12 @@ const handleCancel = () => {
          </p>
          <div class="button-container">
             <button class="btn bg-green" @click="handleOk" v-if="!isLoading">Xác nhận</button>
-            <button class="btn bg-green" v-else>Loading...</button>
+            <button class="btn bg-green" v-else style="display: none">
+              <i class="fas fa-spinner fa-spin"></i> Loading...
+            </button>
+            <div v-if="isLoading" class="loading-overlay">
+              <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 24 24"><rect width="10" height="10" x="1" y="1" fill="currentColor" rx="1"><animate id="svgSpinnersBlocksShuffle20" fill="freeze" attributeName="x" begin="0;svgSpinnersBlocksShuffle27.end" dur="0.2s" values="1;13"/><animate id="svgSpinnersBlocksShuffle21" fill="freeze" attributeName="y" begin="svgSpinnersBlocksShuffle24.end" dur="0.2s" values="1;13"/><animate id="svgSpinnersBlocksShuffle22" fill="freeze" attributeName="x" begin="svgSpinnersBlocksShuffle25.end" dur="0.2s" values="13;1"/><animate id="svgSpinnersBlocksShuffle23" fill="freeze" attributeName="y" begin="svgSpinnersBlocksShuffle26.end" dur="0.2s" values="13;1"/></rect><rect width="10" height="10" x="1" y="13" fill="currentColor" rx="1"><animate id="svgSpinnersBlocksShuffle24" fill="freeze" attributeName="y" begin="svgSpinnersBlocksShuffle20.end" dur="0.2s" values="13;1"/><animate id="svgSpinnersBlocksShuffle25" fill="freeze" attributeName="x" begin="svgSpinnersBlocksShuffle21.end" dur="0.2s" values="1;13"/><animate id="svgSpinnersBlocksShuffle26" fill="freeze" attributeName="y" begin="svgSpinnersBlocksShuffle22.end" dur="0.2s" values="1;13"/><animate id="svgSpinnersBlocksShuffle27" fill="freeze" attributeName="x" begin="svgSpinnersBlocksShuffle23.end" dur="0.2s" values="13;1"/></rect></svg>
+            </div>
          </div>
       </div>
    </div>
@@ -571,6 +641,18 @@ const handleCancel = () => {
     </section>
   </template>
 <style scoped>
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
 .modal-overlay {
    position: fixed;
    top: 0;

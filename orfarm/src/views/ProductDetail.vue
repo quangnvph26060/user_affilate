@@ -49,20 +49,6 @@ const fetchProduct = async () => {
     }
 };
 
-const fetchProductByCategory = async () => {
-    try {
-        const response = await axios.post(`${API_BACK_END}products/bycategory/6`,{id:6});
-        if (response.data.status === 'success') {
-            return response.data.data;
-        } else {
-            console.error('Failed to fetch product data');
-            return null;
-        }
-    } catch (error) {
-        console.error('Error fetching product data:', error);
-        return null;
-    }
-};
 
 const addCart = async () => {
     try {
@@ -92,15 +78,28 @@ const formatCurrency = (value) => {
         style: 'decimal',
         minimumFractionDigits: 0,
         maximumFractionDigits: 0
-      }).format(value);
-      return `${formattedNumber} VND`;
+    }).format(value);
+    return `${formattedNumber} VND`;
 };
 
 onMounted(async () => {
     productInfor.value = await fetchProduct();
     productByCategory.value = await fetchProductByCategory(); 
 });
-
+const fetchProductByCategory = async () => {
+    try {
+        const response = await axios.post(`${API_BACK_END}products/bycategory/${productInfor.value.category_id}`);
+        if (response.data.status === 'success') {
+            return response.data.data;
+        } else {
+            console.error('Failed to fetch product data');
+            return null;
+        }
+    } catch (error) {
+        console.error('Error fetching product data:', error);
+        return null;
+    }
+};
 
 </script>
 <template>

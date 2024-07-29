@@ -3,6 +3,7 @@ import HomePageSlider from '@/components/HomePageSlider.vue'
 import HomeBannerSection from '@/components/HomeBannerSection.vue'
 import HomeBigBannerSection from '@/components/HomeBigBannerSection.vue'
 import ProductSlider from '@/components/ProductSlider.vue'
+import ProductNavTabs from '@/components/ProductNavTabs.vue'
 import HomeBrandProduct from '@/components/HomeBrandProduct.vue'
 import HomeReviewSlider from '@/components/HomeReviewSlider.vue'
 import HomeCartArea from '@/components/HomeCartArea.vue'
@@ -89,11 +90,13 @@ onMounted(async()=>{
    </div>
 </section>
  <!-- HomePage Weekly Product -->
-         <ProductSlider title='Sản phẩm Hot' option='Xem tất cả ' fullscreen='' :hasProcess="true" :slideOnShow='5' :products='data'/>
+         <ProductSlider title='Sản phẩm' option='Xem tất cả ' fullscreen='' :hasProcess="true" :slideOnShow='5' :products='data'/>
          <HomeBannerSection/>
-         <HomeBigBannerSection/>
+         <ProductSlider title='Sản phẩm thịnh hành hàng đầu' option='Xem tất cả ' fullscreen='' :hasProcess="true" :slideOnShow='5' :products='data'/>
+         <ProductNavTabs/>
+         <HomeBigBannerSection/> 
          <HomeBrandProduct :brandId="1"/>
-         <HomeReviewSlider/>
+         <HomeReviewSlider/> <!--bình luận-->
          <HomeCartArea/>
          <HomeBlogArea/>
 </template>

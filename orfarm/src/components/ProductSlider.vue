@@ -80,7 +80,9 @@ const discountPrice = (price, discount) => {
   const discountedPrice = price - (price * (discount / 100));
   return discountedPrice;
 };
-
+const redirectToProduct = (id)=>{
+   return window.location.href =`/product-details/${id}`
+}
 const formatCurrency = (value) => {
    const formattedNumber = new Intl.NumberFormat('en-VN', {
    style: 'decimal',
@@ -97,7 +99,7 @@ const formatCurrency = (value) => {
    <template>
       <section class="weekly-product-area whight-product" :class="fullscreen ? 'pt-75 pb-80' : 'grey-bg'">
          <div :class="{ container: !isValidOption(fullscreen) }">
-            <div class="sections__wrapper white-bg pr-50 pl-50">
+            <div class="sections__wrapper white-bg pr-50 pl-50 main-product">
                <div class="row align-items-center brand-product-title-container" :class=" fullscreen ?? 'fullscreen'">
                   <div class="col-md-6 text-center">
                      <div class="tpsection mb-15">
@@ -127,9 +129,9 @@ const formatCurrency = (value) => {
                 </nav>
                 </div>
                 <div class="tpproduct__all-item" v-else>
-                <a href="#">Xem tất cả 
-                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m8 4l8 8l-8 8"/></svg>
-               </a>
+                  <router-link to="/product-list">
+                                Xem tất cả  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m8 4l8 8l-8 8"/></svg>
+                  </router-link>
                 </div>
             </div>
                   </div>
@@ -152,8 +154,13 @@ const formatCurrency = (value) => {
                               <swiper-slide v-for="product in products">  
                                  <div class="tpproduct p-relative tpprogress__hover">
                                     <div class="tpproduct__thumb p-relative text-center">
-                                        <a href="#"><img :src="getImageUrl(product.images[0]?.image_path)" alt=""></a>
-                                        <a class="tpproduct__thumb-img"  :href="product.id" ><img :src="getImageUrl(product.images[0]?.image_path)" alt=""></a>
+                                       <a href="#"><img :src="getImageUrl(product.images[0]?.image_path)" alt=""></a>
+                                       <!-- <a class="tpproduct__thumb-img"  :href="'product-details/'+ product.id">
+                                          <img :src="getImageUrl(product.images[0]?.image_path)" alt="">
+                                       </a> -->
+                                       <a @click="redirectToProduct(product.id)" class="tpproduct__thumb-img">
+                                          <img :src="getImageUrl(product.images[0]?.image_path)" alt="">
+                                       </a>
                                         <div class="tpproduct__info bage">
                                             <span class="tpproduct__info-discount bage__discount">-{{product.commission_rate}}%</span>
                                             <span class="tpproduct__info-hot bage__hot">HOT</span>
