@@ -1,6 +1,7 @@
 <script setup>
 import BreadCrumb from '@/components/BreadCrumb.vue'
 import ProductSlider from '@/components/ProductSlider.vue'
+import StarRating from './StarRating.vue';
 import { defineProps,onMounted,ref, reactive } from 'vue';
 import axios from 'axios';
 import apiURL  from "../connect.js";
@@ -10,6 +11,8 @@ import { Notyf } from 'notyf';
 import 'notyf/notyf.min.css';
 import { Skeleton } from 'vue-loading-skeleton';
 import "vue-loading-skeleton/dist/style.css"
+import Comment from '../api/comment/comment.js';
+const { submitCommnent, getCommnentAll, responseComment }  = Comment();
 const API_BACK_END = apiURL.baseURL;
 const API_BACK_END_SUB = apiURL.URL;
 const productInfor = ref('');
@@ -22,7 +25,8 @@ const cart = reactive({
     amount: 1,
     user_id: store.state.auth.user.id,
 })
-
+const is_flag = ref('');
+is_flag.value = store.state.auth.user.id;
 const minusQuantity = () => {
     if (cart.amount > 1) {
         cart.amount--;
@@ -33,7 +37,9 @@ const plusQuantity = (item) => {
     cart.amount++;
 };
 
-
+onMounted(async ()=>{
+    await getCommnentAll(productId);
+})
 const fetchProduct = async () => {
     try {
         const response = await axios.post(`${API_BACK_END}products/${productId}`);
@@ -100,7 +106,63 @@ const fetchProductByCategory = async () => {
         return null;
     }
 };
+const userRating = ref(0); 
 
+const handleRatingUpdate = (rating) => {
+  userRating.value = rating;
+};
+const name = ref('');
+const email = ref('');
+const content = ref('');
+const error = reactive({
+  name:"",
+  email:"",
+  content:"",
+  
+});
+const validateComment = () => {
+    let is_result = true;
+    error.name = false;
+    error.email = false;
+    error.content = false;
+    if(!name.value){
+        const nameInput = document.querySelector('.is-invalid');
+    if (nameInput) {
+      nameInput.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+        error.name = true;
+        is_result = false;
+    }
+    if(!email.value){
+        error.email = true;
+        is_result = false;
+    }
+    if(!content.value){
+        error.content = true;
+        is_result = false;
+    }
+    return is_result;
+}
+const handleSubmit = async () => {
+    if(!validateComment()){
+      return;
+    }
+    const formDataOrder = {
+      name: name.value,
+      email: email.value,
+      content: content.value,
+      rate: userRating.value,
+      product_id: productId,
+    };
+    try{
+      await submitCommnent(formDataOrder);
+      await getCommnentAll(productId);
+    
+    }catch (error){
+    } finally {
+      
+    }
+};
 </script>
 <template>
 <BreadCrumb :breadCrumbPath="[{ route: '/', name: 'Trang chủ' }, { route:'shop', name: productInfor?.category?.name },{name: productInfor?.name}]" :isGrey='true'/>
@@ -120,7 +182,7 @@ const fetchProductByCategory = async () => {
                                     <i class="icon-star_outline1"></i>
                                     <i class="icon-star_outline1"></i>
                                     <i class="icon-star_outline1"></i>
-                                    <b>02 Đánh giá</b>
+                                    <b>{{ responseComment.count }} Đánh giá</b>
                                  </li>
                                  <li>
                                     SKU: <span>ORFARMVE005</span>
@@ -215,7 +277,7 @@ const fetchProductByCategory = async () => {
                               <nav>
                                  <div class="nav nav-tabs" role="tablist">
                                    <button class="nav-link active" id="nav-description-tab" data-bs-toggle="tab" data-bs-target="#nav-description" type="button" role="tab" aria-controls="nav-description" aria-selected="true">Mô tả Sản Phẩm</button>
-                                   <button class="nav-link" id="nav-review-tab" data-bs-toggle="tab" data-bs-target="#nav-review" type="button" role="tab" aria-controls="nav-review" aria-selected="false" tabindex="-1">Đánh giá (1)</button>
+                                   <button class="nav-link" id="nav-review-tab" data-bs-toggle="tab" data-bs-target="#nav-review" type="button" role="tab" aria-controls="nav-review" aria-selected="false" tabindex="-1">Đánh giá ({{ responseComment.count ?? 0}})</button>
                                  </div>
                                </nav>
                            </div>
@@ -231,69 +293,69 @@ const fetchProductByCategory = async () => {
 
                               <div class="tab-pane fade" id="nav-review" role="tabpanel" aria-labelledby="nav-review-tab" tabindex="0">
                             <div class="tpreview__wrapper">
-                                <h4 class="tpreview__wrapper-title">1 đánh giá cho Gà tươi ngon rẻ</h4>
-                                <div class="tpreview__comment">
-                                    <div class="tpreview__comment-img mr-20">
-                                        <img src="../assets/img/testimonial/test-avata-1.png" alt="">
-                                    </div>
+                                <h4 class="tpreview__wrapper-title">Đánh giá {{ productInfor?.name }}</h4>
+                                <div class="tpreview__comment" v-for="(item, index) in responseComment.data">
                                     <div class="tpreview__comment-text">
                                         <div class="tpreview__comment-autor-info d-flex align-items-center justify-content-between">
                                             <div class="tpreview__comment-author">
-                                                <span>admin</span>
-                                            </div>
-                                            <div class="tpreview__comment-star">
-                                                <i class="icon-star_outline1"></i>
-                                                <i class="icon-star_outline1"></i>
-                                                <i class="icon-star_outline1"></i>
-                                                <i class="icon-star_outline1"></i>
-                                                <i class="icon-star_outline1"></i>
+                                                <span>{{  item.user.name }}</span>
+                                                <div class="tpreview__comment-star">
+                                                    <i v-for="n in 5"
+                                                        :key="n"
+                                                        class="icon-star_outline1"
+                                                        :class="{ 'yellow-star': n <= item.rate }"
+                                                    ></i>
+                                                </div>
                                             </div>
                                         </div>
-                                        <span class="date mb-20">--Ngày 9 tháng 4 năm 2022: </span>
-                                        <p>rất tốt</p>
+                                        <p>{{ item.content }}</p>
                                     </div>
                                 </div>
                                 <div class="tpreview__form">
                                     <h4 class="tpreview__form-title mb-25">Thêm đánh giá </h4>
-                                    <form action="#">
+                                    <p v-if="is_flag === undefined" class="error-message">Vui lòng chọn  <router-link to="/login">đăng nhập</router-link>  để đánh giá.</p>
+                                    <form action="#" v-else @submit.prevent="handleSubmit">
                                         <div class="row">
                                             <div class="col-lg-6">
                                                 <div class="tpreview__input mb-30">
-                                                    <input type="text" placeholder="Tên">
+                                                    <input type="text" v-model="name" placeholder="Tên" :class="{'is-invalid': error.name}">
+                                                    <span v-if="error.name" class="error-message"> Tên không được bỏ trống </span>
                                                 </div>
+
                                             </div>
                                             <div class="col-lg-6">
                                                 <div class="tpreview__input mb-30">
-                                                    <input type="email" placeholder="Email">
+                                                    <input type="email" v-model="email" placeholder="Email" :class="{'is-invalid': error.email}">
+                                                    <span v-if="error.email" class="error-message"> Email không được bỏ trống </span>
                                                 </div>
                                             </div>
                                             <div class="col-lg-12">
                                                 <div class="tpreview__star mb-20">
                                                     <h4 class="title">Đánh giá của bạn</h4>
                                                     <div class="tpreview__star-icon">
-                                                        <a href="#"><i class="icon-star_outline1"></i></a>
-                                                        <a href="#"><i class="icon-star_outline1"></i></a>
-                                                        <a href="#"><i class="icon-star_outline1"></i></a>
-                                                        <a href="#"><i class="icon-star_outline1"></i></a>
-                                                        <a href="#"><i class="icon-star_outline1"></i></a>
+                                                        <StarRating @update:rating="handleRatingUpdate"/>
+                                                        <!-- <span v-for="n in 5" :key="n" @click="setRating(n)">
+                                                            <i :class="getStarClass(n)"></i>
+                                                        </span> -->
                                                     </div>
                                                 </div>
                                                 <div class="tpreview__input mb-30">
-                                                    <textarea name="text" placeholder="Tin nhắn"></textarea>
+                                                    <textarea v-model="content" name="text" placeholder="Tin nhắn" :class="{'is-invalid': error.content}"></textarea>
+                                                    <span v-if="error.content" class="error-message"> Tin nhắn không được bỏ trống </span>
                                                     <div class="tpreview__submit mt-30">
-                                                        <button class="tp-btn">Gửi</button>
+                                                        <button class="tp-btn" type="submit">Gửi</button>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </form>
-                                                            </div>
+                                </div>
                                                         </div>
                                                     </div>
                                                 </div>   
                                                 </div>
                                             </div>
-                                        </div>
+                            </div>
                                         <div class="col-lg-2 col-md-12">
                                             <div class="tpsidebar pb-30">
                                                 <div class="tpsidebar__warning mb-30">
@@ -343,6 +405,22 @@ const fetchProductByCategory = async () => {
         <ProductSlider title='Sản phẩm tương tự' option='' fullscreen='true' :hasProcess="false" :slideOnShow='5' :products='productByCategory'/>
 </template>
 <style scoped>
+.yellow-star{
+    font-size: 14px;
+    color: var(--tp-text-1) !important;
+}
+.tpreview__comment-star{
+    font-size: 14px;
+    color: gray !important;
+}
+.error-message {
+   color: red;
+   font-size: 12px;
+}
+.is-invalid {
+   border: 2px solid red  !important;
+   border-radius: 4px;
+}
 .tpdetails__product {
     background-color: var(--tp-common-white);
     padding: 35px 40px 45px 40px;
@@ -702,6 +780,7 @@ const fetchProductByCategory = async () => {
     margin-bottom: 20px;
     padding-bottom: 50px;
     border-bottom: 1px solid var(--tp-border-1);
+    width: 100%;
 }
 .tpreview__comment-img {
     flex: 0 0 auto;
@@ -712,6 +791,7 @@ const fetchProductByCategory = async () => {
     border: 1px solid var(--tp-border-1);
     border-radius: 10px;
     padding: 10px;
+    width: 100%;
 }
 .tpreview__comment-author {
     font-weight: 600;
@@ -726,7 +806,7 @@ const fetchProductByCategory = async () => {
 }
 .tpreview__comment-star i {
     font-size: 14px;
-    color: var(--tp-text-1);
+    /* color: var(--tp-text-1); */
 }
 .icon-star_outline1:before {
     margin-right:5px;
