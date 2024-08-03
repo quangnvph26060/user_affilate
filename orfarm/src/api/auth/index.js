@@ -134,7 +134,6 @@ export default function Auth() {
 				const otp = Math.floor(Math.random() * 900000);
 				const formSignupWithOTP = { ...formSignup, otp };	
 				const response = await axios.post(`${API_BACK_END}send-otp`, formSignupWithOTP);
-				console.log(response.data);
 				if(response.data.status === 'success'){
 					var userJSON = JSON.stringify(response.data.data);
 					var encodedData = btoa(userJSON);

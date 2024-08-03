@@ -20,6 +20,7 @@ const formSignup = reactive({
 	name: "",
 	email: "",
 	otp:"",
+  is_referral: true,
 });
 
 

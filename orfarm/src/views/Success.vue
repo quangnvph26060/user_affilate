@@ -20,7 +20,7 @@
                                                 <!--end col-->
                                                 <div class="col-lg-3 col-6">
                                                     <p class="text-muted mb-2 text-uppercase fw-semibold">Ngày tạo</p>
-                                                    <h5 class="fs-14 mb-0"><span id="invoice-date">{{data.created_at}}</span>  </h5>
+                                                    <h5 class="fs-14 mb-0"><span id="invoice-date">{{data.created_at.split("T")[0]}}</span>  </h5>
                                                 </div>
                                                 <!--end col-->
                                                 <div class="col-lg-3 col-6">

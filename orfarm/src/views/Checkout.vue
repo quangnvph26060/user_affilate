@@ -126,25 +126,27 @@ const onDistrictChange = (event) => {
 
 onMounted(fetchLocationData);
 const randomUpperCase = ref("");
+const randomUpperCase1 = ref("");
 const isModalVisible = ref(false);
-
+function generateRandomString(length = 8) {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    let result = '';
+    const charactersLength = characters.length;
+    for (let i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
+  }
 const showModal = () => {
     // Truy cập giá trị đã chọn từ thẻ select
 const selectedProvince = form.billingDetails.district;
-console.log(selectedProvince); 
+
   if(!validateFormOder()){
     return;
   }
-  var result = "";
-	var characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-	var charactersLength = characters.length;
-  for (var i = 0; i < 8; i++) {
-	  var randomIndex = Math.floor(Math.random() * charactersLength);
-	  var randomChar = characters.charAt(randomIndex);
-	  result += randomChar;
-	}
-  
-	randomUpperCase.value = result;
+ 
+  const randomString  = generateRandomString();
+  randomUpperCase.value = randomString;
   
 	if (responseCart.data.length > 0) {
 	  isModalVisible.value = true;
@@ -242,12 +244,16 @@ const handleOk = async () => {
       return;
     }
 	  isLoading.value  = true;
+    if(randomUpperCase.value === ""){
+      const randomString  = generateRandomString();
+      randomUpperCase1.value = randomString;
+    }
     const formDataOrder = {
       name: name.value,
       receive_address: address.value,
       phone: phone.value,
       list_product: data_cart.value,
-      zip_code: randomUpperCase.value,
+      zip_code: randomUpperCase.value === "" ? randomUpperCase1.value : randomUpperCase.value,
       total_money: responseCart.total,
       payment_method:shippingMethod.value,
     };

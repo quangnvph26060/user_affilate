@@ -25,9 +25,10 @@ export default function Order() {
     const submitCommnent = async (formDataOrder) => {
         try {
             const  response  = await axios.post(`${API_BACK_END}comment`,formDataOrder, { headers: headers });
-                if(response.data.status === 'success'){
-                    await router.push({ name: 'InformationLine' })
-                }
+            console.log(response);
+            if(response.status === 200){
+                
+            }
         } catch (error) {
 			throw handleError(error);
         }
