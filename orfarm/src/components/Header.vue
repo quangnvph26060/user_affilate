@@ -324,7 +324,7 @@ onUnmounted(() => {
           <div class="row align-items-center" :class="{ 'header-sticky': isHeaderSticky }">
             <div class="col-xl-3">
               <div class="header__logo">
-                <a href="/"><img src="../assets/img/logo/logo.png" alt="logo" /></a>
+                <a href="/"><img :src="banner" alt="logo" style="width: 60px;height: 60px" /></a>
               </div>
             </div>
             <div class="col-xl-6">
