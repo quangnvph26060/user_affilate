@@ -2,7 +2,14 @@
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import Category from '@/api/category/category';
 const {getCategory, responseData  } = Category();
+import apiURL  from "../connect.js";
+const email = ref('');
+const config = localStorage.getItem('config');
+if (config) {
+  const configArray = JSON.parse(config);
+  email.value = `${configArray['email']}`;
 
+}
 const props = defineProps({
   isHomePage: Boolean,
   isGrey:Boolean,
@@ -119,7 +126,7 @@ onBeforeUnmount(() => {
                 <h4 class="tpfooter__widget-title">Hãy để chúng tôi giúp bạn</h4>
                 <p>
                   Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ với chúng tôi qua:
-                  <a href="mailto:support@example.com">support@example.com</a>
+                  <a :href="`mailto:${email}`">{{ email }}</a>
                 </p>
                 <div class="tpfooter__widget-social mt-45">
                   <span class="tpfooter__widget-social-title" style="margin-bottom:5px;">Mạng xã hội:</span>

@@ -7,6 +7,7 @@ const store = {
         authenticated: false,
         user: {},
         admin: {},
+        config: {},
         token: localStorage.getItem('token') || 0,
     },
     getters: {
@@ -21,6 +22,9 @@ const store = {
         },
         token(state) {
             return state.token
+        },
+        config(state){
+            return state.config
         }
     },
     mutations: {
@@ -36,6 +40,9 @@ const store = {
         setToken(state, token) {
             state.token = token;
         },
+        setConfig(state, config){
+            state.config = config;
+        }
     },
     actions: {
         login({ commit }, { user, token }) {
@@ -73,7 +80,21 @@ const store = {
                 commit('SET_AUTHENTICATED', false);
             }
         },
-       
+        async getConfig({commit, state}) {
+            try {
+                const API = apiURL.URL;
+                const { data } = await axios.get(`${API}/api/get-config`);
+                if (data.status === 'success') {
+                    // Lưu dữ liệu vào localStorage
+                    localStorage.setItem('config', JSON.stringify(data.data));
+
+                    // Commit mutation để lưu dữ liệu vào Vuex store
+                    commit('setConfig', data.data);
+                }
+            } catch ({ res }) {
+                
+            }
+        },
         async logout({commit}, token) {
             localStorage.removeItem('token');
             commit('setUser', {});

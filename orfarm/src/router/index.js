@@ -127,7 +127,9 @@ const isAuthenticated = () => {
 
 router.beforeEach(async (to, from, next) => {
   const store1 = useStore();
-
+  if(!localStorage.getItem('config') &&((localStorage.getItem('config') === '' || localStorage.getItem('config') === null))){
+		await store1.dispatch('getConfig');
+	}
   const users = store1.state.user;
 
   if (to.meta.requiresAuth && !isAuthenticated()) {

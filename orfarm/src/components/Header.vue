@@ -13,7 +13,13 @@ import 'notyf/notyf.min.css';
 import { useFormatCurrency } from "../composables/useFormatCurrency.js";
 const { getToCart, responseCart, clearCartUser,delToCart } = Cart();
 const notyf = new Notyf();
+const banner = ref('');
+const config = localStorage.getItem('config');
+if (config) {
+  const configArray = JSON.parse(config);
+  banner.value = `${apiURL.URL}/${configArray['logo']}`;
 
+}
 const URL_AFFILATE = apiURL.URL_AFFILATE;
 
 const{logout } = Auth();
@@ -163,7 +169,7 @@ onUnmounted(() => {
                      </div>
                      <div class="col-xl-4">
                         <div class="header__logo text-center">
-                           <a href="/"><img src="../assets/img/logo/logo.png" alt="logo"></a>
+                           <a href="/"><img :src="banner" alt="logo" style="width: 60px;height: 60px"></a>
                         </div>
                      </div>
                      <div class="col-xl-4">
