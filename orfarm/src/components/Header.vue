@@ -145,7 +145,7 @@ onUnmounted(() => {
               <div class="header__logout">
                 <form @submit.prevent="logout">
                   
-                  <button type="submit" class="header__logout-button"> Đăng xuất <i class="fa-solid fa-right-from-bracket header__logout-icon"></i></button>
+                  <button type="submit" class="header__logout-button"> Đăng xuất         <i class="fa-solid fa-right-from-bracket header__logout-icon"></i></button>
                 </form>
               </div>
             </div>
