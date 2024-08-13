@@ -172,8 +172,12 @@ const formatCurrency = (value) => {
                                         </div>
                                     </div>
                                     <div class="tpproduct__content">
-                                        <span class="tpproduct__content-weight">
+                                        <span class="tpproduct__content-weight d-flex justify-content-between">
                                             <a href="shop-details.html">{{product.brands.name}}</a>
+
+                                            <a class="main-mobi-cart" href="#" @click.prevent="addCart(product.id)">
+                                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="2"><path d="M5 7h13.79a2 2 0 0 1 1.99 2.199l-.6 6A2 2 0 0 1 18.19 17H8.64a2 2 0 0 1-1.962-1.608L5 7Z"/><path stroke-linecap="round" d="m5 7l-.81-3.243A1 1 0 0 0 3.22 3H2m6 18h2m6 0h2"/></g></svg>
+                                            </a>
                                         </span>
                                         <h4 class="tpproduct__title">
                                             <a href="shop-details-top-.html">{{product.name}}</a>
@@ -222,6 +226,14 @@ const formatCurrency = (value) => {
       </section>
    </template>
 <style scoped>
+.main-mobi-cart{
+      display: none;
+   }
+@media (max-width:768px) {
+   .main-mobi-cart{
+      display: block;
+   }
+}
 .tpsection__title.true{
    font-family: var(--tp-ff-jost);
    font-style: normal;
