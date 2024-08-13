@@ -86,7 +86,7 @@
                                                         <tr>
                                                             <th scope="row">{{ index + 1 }}</th>
                                                             <td class="text-start">
-                                                                <span class="fw-medium">{{ item.product.name }}</span>
+                                                                <span class="fw-medium">{{ item.product.name.substring(0, 50) }}</span>
                                                               
                                                             </td>
                                                             <td>{{ useFormatCurrency(item.product.price) }}</td>
@@ -133,7 +133,7 @@
                                                 <h6 class="text-muted text-uppercase fw-semibold mb-3">Chi tiết thanh toán:
                                                 </h6>
                                                 <p class="text-muted mb-1">Phương thức thanh toán: <span class="fw-medium"
-                                                        id="payment-method">Mastercard</span></p>
+                                                        id="payment-method">{{ data.payment_method === 1 ? "Chuyển khoản" :"Tiền mặt" }}</span></p>
                                                 <p class="text-muted mb-1">Chủ thẻ: <span class="fw-medium"
                                                         id="card-holder-name">{{data.user_id[0].name}}</span></p>
                                                 <p class="text-muted mb-1">Số thẻ: <span class="fw-medium"

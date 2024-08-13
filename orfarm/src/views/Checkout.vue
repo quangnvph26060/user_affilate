@@ -519,7 +519,8 @@ const handleCancel = () => {
                                        <tbody>
                                         <tr v-for="(item, index) in responseCart.data" :key="index" class="cart_item">
                                           <td class="product-name">
-                                            {{ item.product.name }} <strong class="product-quantity"> × {{ item.amount }}</strong>
+                                            {{ item.product.name.substring(0, 50) }} 
+                                            <strong class="product-quantity"> × {{ item.amount }}</strong>
                                           </td>
                                           <td class="product-total">
                                             <span class="amount">{{ useFormatCurrency(item.amount*item.product.price) }}</span>
