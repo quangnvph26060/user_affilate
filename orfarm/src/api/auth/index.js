@@ -68,7 +68,6 @@ export default function Auth() {
 		return error;
 	};
 	const validateFormRegister = async (formSignup) => {
-		console.log(formSignup)
 		let is_flag = true;
 		errors.confirmPassword = '';
 		errors.phone = '';
@@ -129,7 +128,8 @@ export default function Auth() {
 			resultOtp.status = true;
         }
 		if($type == "sendotp"){
-			isOtp.status = true
+			isOtp.status = true;
+			resultOtp.status = true;
 			try {
 				const otp = Math.floor(Math.random() * 900000);
 				const formSignupWithOTP = { ...formSignup, otp };	

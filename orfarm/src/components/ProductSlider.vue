@@ -227,8 +227,8 @@ const formatCurrency = (value) => {
    </template>
 <style scoped>
 .main-mobi-cart{
-      display: none;
-   }
+   display: none;
+}
 @media (max-width:768px) {
    .main-mobi-cart{
       display: block;

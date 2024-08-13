@@ -7,7 +7,7 @@ import {reactive,ref, onMounted} from 'vue';
 import axios from 'axios';
 const router = useRouter();
 import { config } from '@/config/config';
-const{loginForm, submitLogin, errors, resultOtp,submitResgiter } = Auth();
+const{loginForm, submitLogin, errors, resultOtp, submitResgiter } = Auth();
 
 const breadCrumbPath = [{ route: '/', name: 'Trang chủ' }, { name: 'Đăng Ký Tài Khoản' }];
 
