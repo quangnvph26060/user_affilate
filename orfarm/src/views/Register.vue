@@ -97,7 +97,7 @@ const submitOtp1 = (event) => {
                         <div class="form-group mr-2">
                           <input type="text" class="form-control" v-model="otpValue" placeholder="Nhập Mã OTP" />
                         </div>
-                        <button type="submit" class="btn css-dev-only-do-not-override-16xcw0g ant-btn ant-btn-primary h-9 bg-secondary">Xác Nhận</button>
+                        <button type="submit" class="tptrack__submition active btn css-dev-only-do-not-override-16xcw0g ant-btn ant-btn-primary h-9 bg-secondary bg-main">Xác Nhận</button>
                       </div>
                     </form>
                     <span class="text-danger error_message" v-if="errors.otp">{{ errors.otp }}</span>
@@ -107,7 +107,7 @@ const submitOtp1 = (event) => {
               <div class="tpsign__account mb-15">
                 <a href="/login">Đã có tài khoản?</a>
               </div>
-              <div class="tptrack__btn">
+              <div class="tptrack__btn" v-if="resultOtp.status === false">
                 <button class="tptrack__submition tpsign__reg" @click="submitOtp">
                   Đăng ký ngay<i class="fal fa-long-arrow-right"></i>
                 </button>
@@ -164,7 +164,10 @@ const submitOtp1 = (event) => {
   left: 30px;
   font-size: 16px;
 }
-
+.bg-main{
+  margin-top: 10px;
+  background-color: var(--tp-heading-secondary) !important;
+}
 .tptrack__id input,
 .tptrack__email input {
   width: 100%;

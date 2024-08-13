@@ -12,7 +12,13 @@ const API_BACK_END_V1 =apiURL.baseURL;
 const{logout } = Auth();
 const router = useRouter();
 const API_BACK_END = apiURL.URL;
+const banner = ref('');
+const config = localStorage.getItem('config');
+if (config) {
+  const configArray = JSON.parse(config);
+  banner.value = `${apiURL.URL}/${configArray['logo']}`;
 
+}
 const isMenuOpen = ref(false);
 const isCartMenuOpen = ref(false);
 const isHeaderSticky = ref(false);
@@ -121,7 +127,9 @@ onUnmounted(() => {
               </div>
               <div class="col-lg-4 col-md-4 col-6 col-sm-4">
                  <div class="header__logo text-center">
-                    <a href="/"><img src="../assets/img/logo/logo.png" alt="logo"></a>
+                    <router-link to="/">
+                        <img :src="banner" alt="logo" width="100px">
+                    </router-link>
                  </div>
               </div>
               <div class="col-lg-4 col-md-4 col-3 col-sm-5">
@@ -339,7 +347,14 @@ onUnmounted(() => {
             </div>
         </div>
         <div class="tpsideinfo__account-link">							
-           <a href="log-in.html"><i class="icon-user icons"></i> Login / Register</a>
+            <router-link to="/login">
+                <i class="icon-user icons"></i> Login
+            </router-link>
+        </div>
+        <div class="tpsideinfo__account-link">
+           <router-link to="/register">
+                <i class="icon-user icons"></i> Register
+            </router-link>
         </div>
         <div class="tpsideinfo__wishlist-link"> 
            <a href="wishlist.html" target="_parent"><i class="icon-heart"></i> Wishlist</a>

@@ -6,10 +6,12 @@ import store from '../stores/index.js';
 import { defineProps,onMounted,ref, reactive } from 'vue';
 import axios from 'axios';
 import { Notyf } from 'notyf';
+import { useRouter } from "vue-router";
 import 'notyf/notyf.min.css';
 const notyf = new Notyf();
 const API_BACK_END = apiURL.URL;
 const API_BACK_END_V1 =apiURL.baseURL;
+const router = useRouter();
 const props = defineProps({
     title: {
     type: String,
@@ -32,6 +34,7 @@ const props = defineProps({
   }
 });
 
+
 const cart = reactive({
     product_id: '',
     amount: 1,
@@ -39,6 +42,9 @@ const cart = reactive({
 })
 
 const addCart = async (id) => {
+   if(cart.user_id === undefined ){
+      router.push({ name: 'login' });
+   }
     try {
         cart.product_id = id;
         const response = await axios.post(`${API_BACK_END_V1}cart`,cart);
