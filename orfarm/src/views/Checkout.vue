@@ -29,10 +29,10 @@ onMounted(async()=>{
   const user = computed(() => store1.getters['user']);
   const admin = computed(() => store1.getters['admin']);
   if(user){
-      name.value = user.value.name;
-      phone.value = user.value.phone;
-      address.value = user.value.address;
-      email.value = user.value.email;
+    name.value = user.value.name;
+    phone.value = user.value.phone;
+    address.value = user.value.address;
+    email.value = user.value.email;
   }
 
   if (admin) {
@@ -155,7 +155,6 @@ const selectedProvince = form.billingDetails.district;
 
 };
 const hideModal = () => {
-
   isModalVisible.value = false;
 }
 const isLoading = ref(false);
@@ -168,6 +167,8 @@ const error = reactive({
   total_money: 0,
   email:"",
   province:"",
+  ward:"",
+  district:"",
   
 });
 function validateFormOder (){
@@ -177,6 +178,8 @@ function validateFormOder (){
   error.name = false;
   error.phone = false;
   error.province = false;
+  error.district = false;
+  error.ward = false;
   if(responseCart.data.length <= 0){
       notyf.error({
 					message: 'Thêm sản phẩm vào giỏ hàng thành công!',
@@ -204,17 +207,18 @@ function validateFormOder (){
       nameInput.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }
-  if(form.billingDetails.district === ""){
-    error.province = true;
+  if(form.billingDetails.district === null || form.billingDetails.district === ""){
+    error.district = true;
     is_flag = false;
     const nameInput = document.querySelector('.is-invalid');
     if (nameInput) {
       nameInput.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }
-  if(form.billingDetails.ward === ""){
-    error.province = true;
-    is_flag = false;
+
+  if(form.billingDetails.ward === null || form.billingDetails.ward === ""){
+    error.ward = true;
+    is_flag = false; 
     const nameInput = document.querySelector('.is-invalid');
     if (nameInput) {
       nameInput.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -363,10 +367,10 @@ const handleCancel = () => {
               <div class="col-md-12">
                 <div class="country-select">
                   <label>Quận/Huyện <span class="required">*</span></label>
-                  <select :class="{'is-invalid': error.districts}" v-model="form.billingDetails.district"   @change="onDistrictChange($event)">
+                  <select :class="{'is-invalid': error.district}" v-model="form.billingDetails.district"   @change="onDistrictChange($event)">
                     <option v-for="district in districts" :value="district.Name">{{district.Name}}</option>
                   </select>
-                  <span v-if="error.districts" class="error-message">Quận/Huyện không được bỏ trống</span>
+                  <span v-if="error.district" class="error-message">Quận/Huyện không được bỏ trống</span>
                 </div>
               </div>
               <div class="col-md-12">
