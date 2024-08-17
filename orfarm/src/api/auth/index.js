@@ -136,8 +136,8 @@ export default function Auth() {
 				const response = await axios.post(`${API_BACK_END}send-otp`, formSignupWithOTP);
 				if(response.data.status === 'success'){
 					var userJSON = JSON.stringify(response.data.data);
-					var encodedData = btoa(userJSON);
-					localStorage.setItem('user',encodedData);
+					// var encodedData = btoa(userJSON);
+					localStorage.setItem('user',userJSON);
 					showErrorPopup('success','Đã gửi mã OTP về email của bạn', false);
 				} 
 			} catch (error) {
@@ -156,8 +156,8 @@ export default function Auth() {
 			if(!encodedData){
 				return;
 			}
-			var decodedData = atob(encodedData);
-			var userObject = JSON.parse(decodedData);
+		//	var decodedData = atob(encodedData);
+			var userObject = JSON.parse(encodedData);
 			if(userObject['otp'] === parseInt(formSignup['otp'])){
 				try {
 					const response = await axios.post(`${API_BACK_END}register`, formSignup);
